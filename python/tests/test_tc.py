@@ -501,9 +501,9 @@ class TestTC(unittest.TestCase):
             cache = tc.MappingOptionsCache(cache_file.name)
             best_options, = cache.load(
                 tensordot_str, entry_point, (I0, I1), 10)
-            assert str(top1) == str(best_options), (
-                "Expected the same but found {}\nand\n{}".format(
-                    top1, best_options))
+            assert str(top1) == str(
+                best_options
+            ), f"Expected the same but found {top1}\nand\n{best_options}"
 
             executor = tclib.compile(
                 tensordot_str, entry_point, (I0, I1), best_options)

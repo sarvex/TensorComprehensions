@@ -62,7 +62,7 @@ S, v, min_idx = T.mindis(luts_t, codes_t)
 S = T.reduce_codes(luts_t, codes_t)
 v = T.min_2d(S)
 min_idx = T.argmin_2d(S, v)
-print("minval: {} minidx: {}".format(v, min_idx))
+print(f"minval: {v} minidx: {min_idx}")
 
 ################################################################################
 # Each reduction is probably easier to optimize with a 2-staged TC where we
@@ -72,7 +72,7 @@ print("minval: {} minidx: {}".format(v, min_idx))
 ################################################################################
 N = 10 ** 5 # bump to 10**7 when ready for primetime
 D = 1000
-assert N % D == 0, "D={} must divide N={}".format(D, N)
+assert N % D == 0, f"D={D} must divide N={N}"
 M = 32
 
 lang = """
@@ -107,7 +107,7 @@ V = T.min_2d(S.view((D, N // D)))
 v = T.min_1d(V)
 MinIdx = T.argmin_2d(S.view((D, N // D)), v)
 min_idx = T.argmin_1d(S, MinIdx)
-print("minval: {} minidx: {}".format(v, min_idx))
+print(f"minval: {v} minidx: {min_idx}")
 
 ################################################################################
 # Longer form version has an extra k dimension we could use for parallelism
@@ -116,7 +116,7 @@ print("minval: {} minidx: {}".format(v, min_idx))
 ################################################################################
 N = 10 ** 5 # bump to 10**7 when ready for primetime
 D = 1000
-assert N % D == 0, "D={} must divide N={}".format(D, N)
+assert N % D == 0, f"D={D} must divide N={N}"
 M = 32
 K = 16
 codes = np.random.randint(1<<32, size=(N, M // 4)).astype('uint32')
@@ -136,7 +136,7 @@ def mindis(float(K, M, 256) L, uint8(N, M) Codes) -> (S, V, MinIdx) {
 
 T = tc.define(lang, tc.make_naive_options_factory())
 S, V, MinIdx = T.mindis(luts_t, codes_t)
-print("minvals: {}\nminidxs: {}".format(V, MinIdx))
+print(f"minvals: {V}\nminidxs: {MinIdx}")
 
 lang = """
 def reduce_codes(float(K, M, 256) L, uint8(N, M) Codes) -> (S) {
@@ -163,4 +163,4 @@ V2 = T.min_2d(S.view((K, D, N // D)))
 V = T.min_1d(V2)
 MinIdx2 = T.argmin_2d(S.view((K, D, N // D)), V)
 MinIdx = T.argmin_1d(S, MinIdx2)
-print("minval: {} minidx: {}".format(V, MinIdx))
+print(f"minval: {V} minidx: {MinIdx}")

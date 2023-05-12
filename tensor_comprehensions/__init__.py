@@ -198,10 +198,9 @@ def autotune(tc: str,
     if load_from_cache:
         cache = MappingOptionsCache(cache_filename)
         loaded = cache.load(tc, entry_point, inputs, 1)
-        assert len(loaded) > 0, (
-            "Could not load from cache for TC {} and sizes {}".format(
-                entry_point,
-                "".join(str(i.size()) + " " for i in inputs)))
+        assert (
+            len(loaded) > 0
+        ), f'Could not load from cache for TC {entry_point} and sizes {"".join(f"{str(i.size())} " for i in inputs)}'
         base_options = loaded[0]
     else:
         base_options = (
@@ -254,9 +253,7 @@ def autotune_and_compile(
         cache_filename=cache_filename,
         load_from_cache=load_from_cache,
         store_to_cache=store_to_cache)
-    if best is None:
-        return None
-    return compile(tc, entry_point, best, *inputs)
+    return None if best is None else compile(tc, entry_point, best, *inputs)
 
 def make_naive_options_factory() -> (
         Callable[[str, str, Iterable[torch.Tensor]], MappingOptions]):
@@ -285,13 +282,11 @@ def make_load_from_cache_options_factory(cache_filename: str) -> (
             :class:`~tclib.MappingOptions`.
     """
     def generate(tc: str,
-                 entry_point: str,
-                 *inputs: torch.Tensor) -> MappingOptions:
+                     entry_point: str,
+                     *inputs: torch.Tensor) -> MappingOptions:
         cache = MappingOptionsCache(cache_filename)
         loaded = cache.load(tc, entry_point, inputs, 1)
-        if len(loaded) > 0:
-            return loaded[0]
-        return None
+        return loaded[0] if len(loaded) > 0 else None
 
     return generate
 
@@ -361,8 +356,8 @@ class TC(object):
 
         # Locally scoped implicit compilation
         def implicit_compile(tc_obj: TC,
-                             entry_point: str,
-                             *inputs: torch.Tensor):
+                                 entry_point: str,
+                                 *inputs: torch.Tensor):
             already_compiled = tc_obj.compilation_cache.is_compiled(
                 entry_point, inputs)
 
@@ -371,7 +366,7 @@ class TC(object):
 
             global SILENT
             if not SILENT:
-                sizes = "".join(str(i.size()) + " " for i in inputs)
+                sizes = "".join(f"{str(i.size())} " for i in inputs)
                 print(
                     "TC \"{}\" was not explicitly compiled for ".format(entry_point) +
                     "inputs of sizes:\n  {}\n".format(sizes) +
@@ -380,10 +375,13 @@ class TC(object):
             mapping_options = tc_obj.mapping_options_factory(
                 tc_obj.tc, entry_point, *inputs)
 
-            assert mapping_options is not None, (
-                "No options found for TC {} ".format(entry_point) +
-                "with inputs of sizes:\n  {}\n".format(
-                    "".join(str(i.size()) + " " for i in inputs)))
+            assert (
+                mapping_options is not None
+            ), "No options found for TC {} ".format(
+                entry_point
+            ) + "with inputs of sizes:\n  {}\n".format(
+                "".join(f"{str(i.size())} " for i in inputs)
+            )
 
             # Compile best options to set the executor for the current
             #     (entry point, inputs)
@@ -520,8 +518,7 @@ class Function(torch.autograd.Function):
     @staticmethod
     def backward(ctx, *gradients):
         if ctx.backward_fun is not None:
-            inputs = tuple(list(ctx.saved_tensors) + list(
-                t.contiguous() for t in gradients))
+            inputs = tuple((list(ctx.saved_tensors) + [t.contiguous() for t in gradients]))
             # PyTorch convention: need an extra None return for each of
             # forward_fun and backward_fun,
             return (None, None, *ctx.backward_fun(*inputs))

@@ -19,7 +19,7 @@ import torch
 def time_tc(iters, prepend, runFun, entry_point, inputs):
     timesCPU = []
     timesCPUAndGPU = []
-    for i in range(iters):
+    for _ in range(iters):
         torch.cuda.synchronize()
         start = time.clock()
         outputs = runFun(entry_point, inputs)
@@ -28,18 +28,10 @@ def time_tc(iters, prepend, runFun, entry_point, inputs):
         timesCPUAndGPU.append(time.clock() - start)
     print("#################################################################")
     timesCPU = sorted(timesCPU)
-    print("{} Total CPU time to launch kernel: min {}us, p50 {}us, p90 {}us, max {}us".format(
-        prepend,
-        int(timesCPU[0] * 1e6),
-        int(timesCPU[int(len(timesCPU) // 2)] * 1e6),
-        int(timesCPU[int((len(timesCPU) * 9) // 10)] * 1e6),
-        int(timesCPU[len(timesCPU) - 1] * 1e6),
-    ))
+    print(
+        f"{prepend} Total CPU time to launch kernel: min {int(timesCPU[0] * 1000000.0)}us, p50 {int(timesCPU[int(len(timesCPU) // 2)] * 1000000.0)}us, p90 {int(timesCPU[int(len(timesCPU) * 9 // 10)] * 1000000.0)}us, max {int(timesCPU[len(timesCPU) - 1] * 1000000.0)}us"
+    )
     timesCPUAndGPU = sorted(timesCPUAndGPU)
-    print("{} Total CPU launch + GPU kernel time: min {}us, p50 {}us, p90 {}us, max {}us".format(
-        prepend,
-        int(timesCPUAndGPU[0] * 1e6),
-        int(timesCPUAndGPU[int(len(timesCPUAndGPU) // 2)] * 1e6),
-        int(timesCPUAndGPU[int((len(timesCPUAndGPU) * 9) // 10)] * 1e6),
-        int(timesCPUAndGPU[len(timesCPUAndGPU) - 1] * 1e6),
-    ))
+    print(
+        f"{prepend} Total CPU launch + GPU kernel time: min {int(timesCPUAndGPU[0] * 1000000.0)}us, p50 {int(timesCPUAndGPU[int(len(timesCPUAndGPU) // 2)] * 1000000.0)}us, p90 {int(timesCPUAndGPU[int(len(timesCPUAndGPU) * 9 // 10)] * 1000000.0)}us, max {int(timesCPUAndGPU[len(timesCPUAndGPU) - 1] * 1000000.0)}us"
+    )

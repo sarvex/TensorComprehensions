@@ -43,11 +43,11 @@ if os.getenv('TC_BUILD_VERSION') and os.getenv('TC_BUILD_NUMBER'):
     tc_build_number = int(os.getenv('TC_BUILD_NUMBER'))
     tc_version = str(os.getenv('TC_BUILD_VERSION'))
     if tc_build_number > 1:
-        tc_version += '.post' + str(tc_build_number)
+        tc_version += f'.post{tc_build_number}'
 
-print('git_version: {} tc_version: {} tc_build_number: {}'.format(
-    git_version, tc_version, tc_build_number
-))
+print(
+    f'git_version: {git_version} tc_version: {tc_version} tc_build_number: {tc_build_number}'
+)
 
 ################################################################################
 # Custom override commands

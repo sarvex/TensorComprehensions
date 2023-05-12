@@ -24,8 +24,7 @@ from hypothesis import given, settings
 from caffe2.python import core, dyndep
 
 
-CONDA_PREFIX = os.environ.get("CONDA_PREFIX")
-if CONDA_PREFIX:
+if CONDA_PREFIX := os.environ.get("CONDA_PREFIX"):
     tc_c2_lib = os.path.join(CONDA_PREFIX, "lib/libtc_c2.so")
 else:
     dyndep.InitOpsLibrary("@/tc/tc:tc_c2")

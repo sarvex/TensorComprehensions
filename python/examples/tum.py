@@ -224,24 +224,6 @@ def generate_options(tc_str: str,
     # CI time
     return tc.make_naive_options_factory()(tc_str, entry_point, *inputs)
 
-    if entry_point == 'make_idx':
-        return tc.make_naive_options_factory()(tc_str, entry_point, *inputs)
-
-    loaded = tc.make_load_from_cache_options_factory(args.tuner_cache_file)(
-        tc_str, entry_point, *inputs)
-
-    if loaded is None or entry_point in reinforce_list or '*' in reinforce_list:
-        start = loaded if loaded is not None else 'naive'
-        return tc.make_autotuned_options_factory(
-            starting_options=start,
-            tuner_config=tuner_config,
-            cache_filename=args.tuner_cache_file,
-            store_to_cache=True,)(tc_str, entry_point, *inputs)
-
-    assert loaded is not None, 'None found'
-
-    return loaded
-
 
 ###############################################################################
 # Define the TC for LENGTHS_COSINE_COHERENCE, use
@@ -297,4 +279,4 @@ tc.assert_almost_equal(
     operations=SegmentsMetaData.size(0) * (SegmentsMetaData.size(0) + 1) // 2,
 )
 
-print('SUCCESS, maxdiff={}'.format((Output.cpu() - torch.from_numpy(R)).abs().max()))
+print(f'SUCCESS, maxdiff={(Output.cpu() - torch.from_numpy(R)).abs().max()}')
